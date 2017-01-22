@@ -146,12 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimRect.cpp" />
     <ClCompile Include="Bonus.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="TextButton.cpp" />
     <ClCompile Include="Text.cpp" />
     <ClCompile Include="Laser.cpp" />
-    <ClCompile Include="Meteor.cpp" />
+    <ClCompile Include="Asteroid.cpp" />
     <ClCompile Include="Shooter.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
@@ -159,13 +161,15 @@
     <ClCompile Include="Resources.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimRect.h" />
     <ClInclude Include="Bonus.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="TextButton.h" />
     <ClInclude Include="Text.h" />
     <ClInclude Include="Laser.h" />
     <ClInclude Include="Constants.h" />
-    <ClInclude Include="Meteor.h" />
+    <ClInclude Include="Asteroid.h" />
     <ClInclude Include="Shooter.h" />
     <ClInclude Include="IScene.h" />
     <ClInclude Include="Level.h" />

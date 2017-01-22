@@ -4,6 +4,7 @@
 #include "IObject.h"
 #include "Laser.h"
 #include "Constants.h"
+#include "Animation.h"
 #include <vector>
 
 class CShooter :
@@ -24,6 +25,7 @@ private:
 	void Move(float deltaTime);
 	void Shoot();
 
+	CAnimation m_animation;
 	std::vector<CLaser *> & m_lasers;
 	float m_reloadTime = SHOOTER_RELOAD;
 	int m_health = SHOOTER_HEALTH;

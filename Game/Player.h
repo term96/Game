@@ -5,6 +5,7 @@
 #include "IObject.h"
 #include "Laser.h"
 #include "Constants.h"
+#include "Animation.h"
 #include <vector>
 
 class CPlayer : public IObject
@@ -26,6 +27,7 @@ private:
 	void Move(int direction, float deltaTime);
 	void Shoot();
 
+	CAnimation m_animation;
 	std::vector<CLaser *> & m_lasers;
 	int m_health = PLAYER_HEALTH;
 	float m_reloadTime = PLAYER_RELOAD;

@@ -7,17 +7,18 @@ enum Direction
 	LEFT = -1, RIGHT = 1
 };
 
-class CMeteor :
+class CAsteroid :
 	public IObject
 {
 public:
-	CMeteor(sf::Vector2f position);
-	~CMeteor() = default;
+	CAsteroid(sf::Vector2f position);
+	~CAsteroid() = default;
 	
 	void Update(float deltaTime) override;
-
 	sf::Vector2f GetPosition() const override;
 	sf::RectangleShape & GetShape() override;
+
+	float GetHorizontalSpeed() const;
 private:
 	sf::RectangleShape m_shape;
 	Direction m_direction;

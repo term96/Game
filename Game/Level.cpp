@@ -7,7 +7,7 @@ using namespace std;
 using namespace sf;
 
 CLevel::CLevel(RenderWindow & window)
-	:m_player(new CPlayer(Vector2f(window.getSize().x / 2 - PLAYER_WIDTH / 2, window.getSize().y - PLAYER_HEIGHT * 1.2f), m_lasers))
+	:m_player(new CPlayer(Vector2f(WINDOW_WIDTH / 2 - PLAYER_WIDTH / 2, PLAYER_START_HEIGHT), m_lasers))
 	,m_clock()
 	,m_window(window)
 {
@@ -68,22 +68,35 @@ void CLevel::Draw() const
 	m_window.setMouseCursorVisible(false);
 	m_window.draw(m_background);
 
-	for (auto laser : m_lasers)
+	if (!isStopped)
 	{
-		m_window.draw(laser->GetShape());
-	}
-	for (auto shooter : m_shooters)
-	{
-		m_window.draw(shooter->GetShape());
-	}
-	for (auto meteor : m_meteors)
-	{
-		m_window.draw(meteor->GetShape());
-	}
-	m_window.draw(m_player->GetShape());
+		for (auto laser : m_lasers)
+		{
+			m_window.draw(laser->GetShape());
+		}
+		for (auto shooter : m_shooters)
+		{
+			m_window.draw(shooter->GetShape());
+		}
+		for (auto asteroid : m_asteroids)
+		{
+			m_window.draw(asteroid->GetShape());
+		}
+		m_window.draw(m_player->GetShape());
+		m_window.draw(m_healthText->GetShape());
+		m_window.draw(m_targetText->GetShape());
+		if (m_bonus != nullptr)
+			m_window.draw(m_bonus->GetShape());
 
-	if (m_bonus != nullptr)
-		m_window.draw(m_bonus->GetShape());
+		for (auto animation : m_animations)
+		{
+			m_window.draw(animation->GetShape());
+		}
+	}
+	else
+	{
+		m_window.draw(m_gameEndText->GetShape());
+	}
 
 	if (isPaused || isStopped)
 	{
@@ -91,17 +104,7 @@ void CLevel::Draw() const
 		m_window.draw(m_exitButton->GetShape());
 		m_window.setMouseCursorVisible(true);
 	}
-
 	m_window.draw(m_scoreText->GetShape());
-	if (!isStopped)
-	{
-		m_window.draw(m_healthText->GetShape());
-		m_window.draw(m_targetText->GetShape());
-	}
-	else
-	{
-		m_window.draw(m_gameEndText->GetShape());
-	}
 
 	m_window.display();
 }
@@ -168,7 +171,7 @@ void CLevel::Update()
 
 		m_bonusTime -= deltaTime;
 		m_shooterTime -= deltaTime;
-		m_meteorTime -= deltaTime;
+		m_asteroidTime -= deltaTime;
 		Generate();
 
 		if (m_slowMultiplier < 1.f)
@@ -181,8 +184,9 @@ void CLevel::Update()
 		UpdateBackground(deltaTime);
 		UpdatePlayer(deltaTime);
 		UpdateBonus(deltaTime);
-		UpdateMeteors(deltaTime);
+		UpdateAsteroids(deltaTime);
 		UpdateShooters(deltaTime);
+		UpdateAnimations(deltaTime);
 		UpdateLasers(deltaTime);
 		UpdateTexts();
 	}
@@ -203,9 +207,7 @@ void CLevel::UpdateLasers(float deltaTime)
 	{
 		auto laser = m_lasers.at(i);
 		laser->Update(deltaTime * m_slowMultiplier);
-		Vector2f position = laser->GetPosition();
-
-		if (position.y > m_window.getSize().y || position.y < 0)
+		if (laser->GetShape().getGlobalBounds().top >= WINDOW_HEIGHT || laser->GetPosition().y <= -LASER_HEIGHT / 2)
 		{
 			delete laser;
 			m_lasers.erase(m_lasers.begin() + i);
@@ -214,6 +216,9 @@ void CLevel::UpdateLasers(float deltaTime)
 
 		if (CheckCollision(laser, m_player))
 		{
+			CAnimRect * animRect = CreateAnimation(laser->GetPosition(), AnimType::BLUE_DAMAGE);
+			m_animations.push_back(animRect);
+
 			m_player->Hit(SHOOT_DAMAGE);
 			delete laser;
 			m_lasers.erase(m_lasers.begin() + i);
@@ -224,6 +229,9 @@ void CLevel::UpdateLasers(float deltaTime)
 		{
 			if (CheckCollision(laser, shooter))
 			{
+				CAnimRect * animRect = CreateAnimation(laser->GetPosition(), AnimType::RED_DAMAGE);
+				m_animations.push_back(animRect);
+
 				shooter->Hit(SHOOT_DAMAGE);
 				delete laser;
 				m_lasers.erase(m_lasers.begin() + i);
@@ -251,6 +259,9 @@ void CLevel::UpdateShooters(float deltaTime)
 		
 		if (shooter->GetHealth() <= 0)
 		{
+			CAnimRect * animRect = CreateAnimation(shooter->GetPosition(), AnimType::SHOOTER_EXPLOSION);
+			m_animations.push_back(animRect);
+
 			delete shooter;
 			m_shooters.erase(m_shooters.begin() + i);
 			m_score += SCORE_FOR_KILL * m_gameSpeed;
@@ -260,6 +271,9 @@ void CLevel::UpdateShooters(float deltaTime)
 
 		if (CheckCollision(shooter, m_player))
 		{
+			CAnimRect * animRect = CreateAnimation(shooter->GetPosition(), AnimType::SHOOTER_EXPLOSION);
+			m_animations.push_back(animRect);
+
 			delete shooter;
 			m_shooters.erase(m_shooters.begin() + i);
 			m_score += SCORE_FOR_KILL * m_gameSpeed;
@@ -268,7 +282,7 @@ void CLevel::UpdateShooters(float deltaTime)
 			continue;
 		}
 
-		if (shooter->GetPosition().y >= WINDOW_HEIGHT)
+		if (shooter->GetShape().getGlobalBounds().top >= WINDOW_HEIGHT)
 		{
 			delete shooter;
 			m_shooters.erase(m_shooters.begin() + i);
@@ -276,24 +290,27 @@ void CLevel::UpdateShooters(float deltaTime)
 	}
 }
 
-void CLevel::UpdateMeteors(float deltaTime)
+void CLevel::UpdateAsteroids(float deltaTime)
 {
-	for (size_t i = 0; i < m_meteors.size(); ++i)
+	for (size_t i = 0; i < m_asteroids.size(); ++i)
 	{
-		auto meteor = m_meteors[i];
-		meteor->Update(deltaTime * m_slowMultiplier);
+		auto asteroid = m_asteroids[i];
+		asteroid->Update(deltaTime * m_slowMultiplier);
 
-		if (CheckCollision(m_player, meteor))
+		if (CheckCollision(m_player, asteroid))
 		{
-			delete meteor;
-			m_meteors.erase(m_meteors.begin() + i);
+			CAnimRect * animRect = CreateAnimation(asteroid->GetPosition(), AnimType::ASTEROID_EXPLOSION);
+			m_animations.push_back(animRect);
+
+			delete asteroid;
+			m_asteroids.erase(m_asteroids.begin() + i);
 			m_player->Hit(BUMP_DAMAGE);
 			continue;
 		}
-		if (meteor->GetPosition().y >= WINDOW_HEIGHT)
+		if (asteroid->GetShape().getGlobalBounds().top >= WINDOW_HEIGHT)
 		{
-			delete meteor;
-			m_meteors.erase(m_meteors.begin() + i);
+			delete asteroid;
+			m_asteroids.erase(m_asteroids.begin() + i);
 		}
 	}
 }
@@ -327,6 +344,20 @@ void CLevel::UpdateBonus(float deltaTime)
 	}
 }
 
+void CLevel::UpdateAnimations(float deltaTime)
+{
+	for (size_t i = 0; i < m_animations.size(); ++i)
+	{
+		auto animation = m_animations[i];
+		animation->Update(deltaTime * m_slowMultiplier);
+		if (animation->IsStopped())
+		{
+			delete animation;
+			m_animations.erase(m_animations.begin() + i);
+		}
+	}
+}
+
 void CLevel::UpdateTexts()
 {
 	m_healthText->SetString(L"HP: " + to_string(m_player->GetHealth()));
@@ -354,6 +385,28 @@ void CLevel::UpdateButtons()
 	}
 }
 
+CAnimRect * CLevel::CreateAnimation(Vector2f position, AnimType type)
+{
+	CAnimRect * animRect = nullptr; 
+	switch (type)
+	{
+	case AnimType::ASTEROID_EXPLOSION:
+		animRect = new CAnimRect(position, Resources::GetAsteroidExplosion(), EXPLOSION_ANIM_TIME);
+		break;
+	case AnimType::SHOOTER_EXPLOSION:
+		animRect = new CAnimRect(position, Resources::GetShooterExplosion(), EXPLOSION_ANIM_TIME);
+		break;
+	case AnimType::RED_DAMAGE:
+		animRect = new CAnimRect(position, Resources::GetRedDamage(), DAMAGE_ANIM_TIME);
+		break;
+	case AnimType::BLUE_DAMAGE:
+		animRect = new CAnimRect(position, Resources::GetBlueDamage(), DAMAGE_ANIM_TIME);
+		break;
+	}
+	
+	return animRect;
+}
+
 void CLevel::Generate()
 {
 	float x;
@@ -365,12 +418,12 @@ void CLevel::Generate()
 		m_bonusTime = BONUS_GENERATION;
 	}
 
-	if (m_meteorTime <= 0)
+	if (m_asteroidTime <= 0)
 	{
-		x = static_cast<float>(rand() % static_cast<int>(WINDOW_WIDTH - MAX_METEOR_WIDTH));
-		CMeteor * meteor = new CMeteor(Vector2f(x, -MAX_METEOR_HEIGHT));
-		m_meteors.push_back(meteor);
-		m_meteorTime = METEOR_GENERATION / m_slowMultiplier / m_gameSpeed;
+		x = static_cast<float>(rand() % static_cast<int>(WINDOW_WIDTH - MAX_ASTEROID_WIDTH));
+		CAsteroid * asteroid = new CAsteroid(Vector2f(x, -MAX_ASTEROID_HEIGHT));
+		m_asteroids.push_back(asteroid);
+		m_asteroidTime = ASTEROID_GENERATION / m_slowMultiplier / m_gameSpeed;
 	}
 
 	if (m_shooterTime <= 0)
@@ -406,7 +459,9 @@ void CLevel::StopGame()
 	}
 	else
 	{
-		m_gameEndText->SetString(L"Level completed!");
+		m_gameEndText->SetString(L"You won! (+50000)");
+		m_score += 50000;
+		m_scoreText->SetString(L"Score: " + to_string(static_cast<int>(m_score)));
 	}
 
 	Vector2f position;
@@ -431,7 +486,22 @@ void CLevel::StopGame()
 
 bool CLevel::CheckCollision(IObject * first, IObject * second)
 {
-	return first->GetShape().getGlobalBounds().intersects(second->GetShape().getGlobalBounds());
+	static FloatRect firstCorrected;
+	static FloatRect secondCorrected;
+
+	FloatRect firstRect = first->GetShape().getGlobalBounds();
+	firstCorrected.left = firstRect.left + firstRect.width * 0.05f;
+	firstCorrected.top = firstRect.top + firstRect.height * 0.05f;
+	firstCorrected.height = firstRect.height * 0.9f;
+	firstCorrected.width = firstRect.width * 0.9f;
+
+	FloatRect secondRect = second->GetShape().getGlobalBounds();
+	secondCorrected.left = secondRect.left + secondRect.width * 0.05f;
+	secondCorrected.top = secondRect.top + secondRect.height * 0.05f;
+	secondCorrected.height = secondRect.height * 0.9f;
+	secondCorrected.width = secondRect.width * 0.9f;
+
+	return firstCorrected.intersects(secondCorrected);
 }
 
 CLevel::~CLevel()
@@ -452,11 +522,12 @@ CLevel::~CLevel()
 		delete laser;
 	for (auto shooter : m_shooters)
 		delete shooter;
-	for (auto meteor : m_meteors)
-		delete meteor;
+	for (auto asteroid : m_asteroids)
+		delete asteroid;
 }
 
 /*
 1. Тип снаряда, траектория, тип повреждений
-2. Анимации взрыва, полёта, реактивный след
+2. Анимации взрыва, полёта, повреждений
+3. Астероиды, которые крутятся, и летят не только вертикально
 */

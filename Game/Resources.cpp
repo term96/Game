@@ -2,51 +2,104 @@
 #include <math.h>
 
 using namespace sf;
-Texture Resources::m_player;
-Texture Resources::m_shooter;
-Texture Resources::m_background;
+using namespace std;
+
+vector<Texture> Resources::m_shooterAnimation;
+vector<Texture> Resources::m_playerAnimation;
+vector<Texture> Resources::m_shooterExplosion;
+vector<Texture> Resources::m_asteroidExplosion;
+vector<Texture> Resources::m_redDamage;
+vector<Texture> Resources::m_blueDamage;
 
 Texture Resources::m_laserUp;
 Texture Resources::m_laserDown;
 
-Texture Resources::m_meteor1;
-Texture Resources::m_meteor2;
-Texture Resources::m_meteor3;
+Texture Resources::m_asteroid1;
+Texture Resources::m_asteroid2;
+Texture Resources::m_asteroid3;
 
 Texture Resources::m_healthStar;
 Texture Resources::m_slowStar;
+Texture Resources::m_background;
 
 Font Resources::m_font;
 
 void Resources::Init()
 {
-	m_player.loadFromFile("resources/player.png");
-	m_shooter.loadFromFile("resources/shooter.png");
-	m_background.loadFromFile("resources/background.jpg");
+	Texture texture;
+	for (int i = 1; i <= 8; ++i)
+	{
+		texture.loadFromFile("resources/shooter/" + to_string(i) + ".png");
+		m_shooterAnimation.push_back(texture);
+	}
+	for (int i = 1; i <= 8; ++i)
+	{
+		texture.loadFromFile("resources/player/" + to_string(i) + ".png");
+		m_playerAnimation.push_back(texture);
+	}
+	for (int i = 0; i <= 8; ++i)
+	{
+		texture.loadFromFile("resources/shooter_explosion/explosion0" + to_string(i) + ".png");
+		m_shooterExplosion.push_back(texture);
+	}
+	for (int i = 0; i <= 14; ++i)
+	{
+		texture.loadFromFile("resources/asteroid_explosion/" + to_string(i) + ".png");
+		m_asteroidExplosion.push_back(texture);
+	}
+	for (int i = 0; i <= 16; ++i)
+	{
+		texture.loadFromFile("resources/red_damage/1_" + to_string(i) + ".png");
+		m_redDamage.push_back(texture);
+	}
+	for (int i = 0; i <= 16; ++i)
+	{
+		texture.loadFromFile("resources/blue_damage/1_" + to_string(i) + ".png");
+		m_blueDamage.push_back(texture);
+	}
 
 	m_laserUp.loadFromFile("resources/laserUp.png");
 	m_laserDown.loadFromFile("resources/laserDown.png");
 
-	m_meteor1.loadFromFile("resources/meteor1.png");
-	m_meteor2.loadFromFile("resources/meteor2.png");
-	m_meteor3.loadFromFile("resources/meteor3.png");
+	m_asteroid1.loadFromFile("resources/asteroid1.png");
+	m_asteroid2.loadFromFile("resources/asteroid2.png");
+	m_asteroid3.loadFromFile("resources/asteroid3.png");
 
 	m_healthStar.loadFromFile("resources/healthStar.png");
 	m_slowStar.loadFromFile("resources/slowStar.png");
+	m_background.loadFromFile("resources/background.jpg");
 
 	m_font.loadFromFile("resources/font.ttf");
-
-	m_background.setRepeated(true);
 }
 
-const sf::Texture * Resources::GetShooterTexture()
+const vector<Texture> & Resources::GetShooterAnimation()
 {
-	return &m_shooter;
+	return m_shooterAnimation;
 }
 
-const sf::Texture * Resources::GetPlayerTexture()
+const vector<Texture> & Resources::GetPlayerAnimation()
 {
-	return &m_player;
+	return m_playerAnimation;
+}
+
+const vector<Texture> & Resources::GetShooterExplosion()
+{
+	return m_shooterExplosion;
+}
+
+const vector<Texture> & Resources::GetAsteroidExplosion()
+{
+	return m_asteroidExplosion;
+}
+
+const vector<Texture> & Resources::GetRedDamage()
+{
+	return m_redDamage;
+}
+
+const vector<Texture> & Resources::GetBlueDamage()
+{
+	return m_blueDamage;
 }
 
 const sf::Texture * Resources::GetLaserUpTexture()
@@ -74,17 +127,17 @@ const sf::Texture & Resources::GetBackgroundTexture()
 	return m_background;
 }
 
-const sf::Texture * Resources::GetRandomMeteorTexture()
+const sf::Texture * Resources::GetRandomAsteroidTexture()
 {
 	int meteor = rand() % 3;
 	switch (meteor)
 	{
 	case 0:
-		return &m_meteor1;
+		return &m_asteroid1;
 	case 1:
-		return &m_meteor2;
+		return &m_asteroid2;
 	default:
-		return &m_meteor3;
+		return &m_asteroid3;
 	}
 }
 

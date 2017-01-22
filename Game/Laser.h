@@ -22,7 +22,6 @@ private:
 	void Move(float deltaTime);
 
 	LaserDirection m_direction;
-	float m_speed = 600.f;
 	sf::RectangleShape m_shape;
 };
 

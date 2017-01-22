@@ -6,10 +6,16 @@
 #include "Laser.h"
 #include "Shooter.h"
 #include "Text.h"
-#include "Meteor.h"
+#include "Asteroid.h"
 #include "Bonus.h"
 #include "TextButton.h"
+#include "AnimRect.h"
 #include <vector>
+
+enum AnimType
+{
+	ASTEROID_EXPLOSION, SHOOTER_EXPLOSION, BLUE_DAMAGE, RED_DAMAGE
+};
 
 class CLevel :
 	public IScene
@@ -31,10 +37,13 @@ private:
 	void UpdateLasers(float deltaTime);
 	void UpdatePlayer(float deltaTime);
 	void UpdateShooters(float deltaTime);
-	void UpdateMeteors(float deltaTime);
+	void UpdateAsteroids(float deltaTime);
 	void UpdateBonus(float deltaTime);
+	void UpdateAnimations(float deltaTime);
 	void UpdateTexts();
 	void UpdateButtons();
+
+	CAnimRect * CreateAnimation(sf::Vector2f position, AnimType type);
 
 	void Generate();
 
@@ -56,7 +65,7 @@ private:
 
 	float m_bonusTime = BONUS_GENERATION;
 	float m_shooterTime = SHOOTER_GENERATION;
-	float m_meteorTime = METEOR_GENERATION;
+	float m_asteroidTime = ASTEROID_GENERATION;
 
 	sf::RenderWindow & m_window;
 	sf::Clock m_clock;
@@ -64,7 +73,8 @@ private:
 
 	std::vector<CLaser *> m_lasers;
 	std::vector<CShooter *> m_shooters;
-	std::vector<CMeteor *> m_meteors;
+	std::vector<CAsteroid *> m_asteroids;
+	std::vector<CAnimRect *> m_animations;
 	CPlayer * m_player;
 	CBonus * m_bonus = nullptr;
 

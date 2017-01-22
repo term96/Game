@@ -6,8 +6,9 @@ using namespace std;
 
 CLaser::CLaser(Vector2f position, LaserDirection direction)
 {
-	m_shape.setSize(Vector2f(BULLET_WIDTH, BULLET_HEIGHT));
-	m_shape.setPosition(position);
+	m_shape.setOrigin(LASER_WIDTH / 2, LASER_HEIGHT / 2);
+	m_shape.setSize(Vector2f(LASER_WIDTH, LASER_HEIGHT));
+	m_shape.setPosition(position.x + LASER_WIDTH / 2, position.y + LASER_HEIGHT / 2);
 	m_direction = direction;
 
 	if (direction == LaserDirection::UP)
@@ -37,5 +38,5 @@ sf::RectangleShape & CLaser::GetShape()
 
 void CLaser::Move(float deltaTime)
 {
-	m_shape.move(0, m_direction * m_speed * deltaTime);
+	m_shape.move(0, m_direction * LASER_SPEED * deltaTime);
 }
