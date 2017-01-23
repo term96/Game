@@ -59,7 +59,7 @@ void CShooter::Shoot()
 	position.x = m_shape.getPosition().x - LASER_WIDTH / 2;
 	position.y = m_shape.getGlobalBounds().top + SHOOTER_HEIGHT + 20.f;
 
-	CLaser * laser = new CLaser(position, LaserDirection::DOWN);
+	CLaser * laser = new CLaser(position, LaserType::BLUE);
 	m_lasers.push_back(laser);
 
 	m_reloadTime = SHOOTER_RELOAD;

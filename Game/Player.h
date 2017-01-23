@@ -24,7 +24,7 @@ public:
 
 	void SetPosition(sf::Vector2f position);
 private:
-	void Move(int direction, float deltaTime);
+	void Move(int directionX, int directionY, float deltaTime);
 	void Shoot();
 
 	CAnimation m_animation;

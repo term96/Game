@@ -15,23 +15,32 @@ CPlayer::CPlayer(Vector2f position, vector<CLaser *> & lasers)
 
 void CPlayer::Update(float deltaTime)
 {
+	static int directionX;
+	static int directionY;
+
 	m_reloadTime -= deltaTime;
 	if (Keyboard::isKeyPressed(sf::Keyboard::Space))
 		Shoot();
+
+	directionX = 0;
+	directionY = 0;
 	if (Keyboard::isKeyPressed(sf::Keyboard::D) || Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		Move(1, deltaTime);
-		m_shape.setRotation(10);
+		directionX = 1;
 	}
 	else if (Keyboard::isKeyPressed(sf::Keyboard::A) || Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		Move(-1, deltaTime);
-		m_shape.setRotation(-10);
+		directionX = -1;
 	}
-	else
+	if (Keyboard::isKeyPressed(sf::Keyboard::W) || Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		m_shape.setRotation(0);
+		directionY = -1;
 	}
+	else if (Keyboard::isKeyPressed(sf::Keyboard::S) || Keyboard::isKeyPressed(sf::Keyboard::Down))
+	{
+		directionY = 1;
+	}
+	Move(directionX, directionY, deltaTime);
 	m_animation.Update(deltaTime);
 	m_shape.setTexture(m_animation.GetTexture());
 }
@@ -70,14 +79,23 @@ void CPlayer::SetPosition(Vector2f position)
 	m_shape.setPosition(position);
 }
 
-void CPlayer::Move(int direction, float deltaTime)
+void CPlayer::Move(int directionX, int directionY, float deltaTime)
 {
-	float posX = m_shape.getPosition().x;
-	float deltaX = direction * PLAYER_SPEED * deltaTime;
+	float posX = m_shape.getGlobalBounds().left;
+	float deltaX = directionX * PLAYER_SPEED * deltaTime;
 	if (posX + deltaX <= 0 || posX + PLAYER_WIDTH + deltaX >= WINDOW_WIDTH)
-		return;
+	{
+		deltaX = 0;
+	}
+	float posY = m_shape.getGlobalBounds().top;
+	float deltaY = directionY * PLAYER_SPEED * deltaTime;
+	if (posY + deltaY <= 0 || posY + PLAYER_HEIGHT + deltaY >= WINDOW_HEIGHT)
+	{
+		deltaY = 0;
+	}
 
-	m_shape.move(deltaX, 0);
+	m_shape.move(deltaX, deltaY);
+	m_shape.setRotation(directionX * PLAYER_ROTATION);
 }
 
 void CPlayer::Shoot()
@@ -89,7 +107,7 @@ void CPlayer::Shoot()
 	position.x = m_shape.getPosition().x - LASER_WIDTH / 2;
 	position.y = m_shape.getGlobalBounds().top - 20.f;
 
-	CLaser * laser = new CLaser(position, LaserDirection::UP);
+	CLaser * laser = new CLaser(position, LaserType::RED);
 	m_lasers.push_back(laser);
 
 	m_reloadTime = PLAYER_RELOAD;

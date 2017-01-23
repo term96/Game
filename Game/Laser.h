@@ -4,24 +4,26 @@
 #include "SFML\Graphics.hpp"
 #include "IObject.h"
 
-enum LaserDirection
+enum LaserType
 {
-	UP = -1, DOWN = 1
+	RED = -1, BLUE = 1
 };
 
 class CLaser : public IObject
 {
 public:
-	CLaser(sf::Vector2f position, LaserDirection direction);
+	CLaser(sf::Vector2f position, LaserType direction);
 	~CLaser() = default;
 
 	void Update(float deltaTime) override;
 	sf::Vector2f GetPosition() const override;
 	sf::RectangleShape & GetShape() override;
+
+	LaserType GetType() const;
 private:
 	void Move(float deltaTime);
 
-	LaserDirection m_direction;
+	LaserType m_type;
 	sf::RectangleShape m_shape;
 };
 

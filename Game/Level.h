@@ -43,7 +43,7 @@ private:
 	void UpdateTexts();
 	void UpdateButtons();
 
-	CAnimRect * CreateAnimation(sf::Vector2f position, AnimType type);
+	void CreateAnimation(sf::Vector2f position, AnimType type);
 
 	void Generate();
 

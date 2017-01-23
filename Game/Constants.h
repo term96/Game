@@ -17,7 +17,7 @@ static const float MAX_ASTEROID_HEIGHT = 100.f;
 // Время генерации
 static const float BONUS_GENERATION = 30.f;
 static const float SHOOTER_GENERATION = 6.f;
-static const float ASTEROID_GENERATION = 1.5f;
+static const float ASTEROID_GENERATION = 1.25f;
 
 // Скорости
 static const float BONUS_SPEED = WINDOW_HEIGHT / 5;
@@ -25,10 +25,13 @@ static const float LASER_SPEED = 600.f;
 static const float SHOOTER_SPEED = WINDOW_HEIGHT / 6;
 static const float PLAYER_SPEED = WINDOW_WIDTH / 2.5f;
 static const float BACKGROUND_SPEED = WINDOW_HEIGHT / 20.f;
-static const float ASTEROID_ROTATION = 90.f;
 static const float ASTEROID_VERT_SPEED = WINDOW_HEIGHT / 2;
 static const int ASTEROID_MAX_HOR_TIME = 9;
 static const int ASTEROID_MIN_HOR_TIME = 5;
+
+// Повороты
+static const float ASTEROID_ROTATION = 90.f;
+static const float PLAYER_ROTATION = 10.f;
 
 // Время перезарядки
 static const float SHOOTER_RELOAD = 0.75f;
