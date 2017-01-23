@@ -526,6 +526,8 @@ CLevel::~CLevel()
 		delete m_gameEndText;
 	if (m_bonus != nullptr)
 		delete m_bonus;
+	if (m_hint != nullptr)
+		delete m_hint;
 
 	for (auto laser : m_lasers)
 		delete laser;
@@ -534,9 +536,3 @@ CLevel::~CLevel()
 	for (auto asteroid : m_asteroids)
 		delete asteroid;
 }
-
-/*
-1. Тип снаряда, траектория, тип повреждений
-2. Анимации взрыва, полёта, повреждений
-3. Астероиды, которые крутятся, и летят не только вертикально
-*/
