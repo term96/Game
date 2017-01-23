@@ -149,6 +149,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimRect.cpp" />
     <ClCompile Include="Bonus.cpp" />
+    <ClCompile Include="Hint.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="TextButton.cpp" />
     <ClCompile Include="Text.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="AnimRect.h" />
     <ClInclude Include="Bonus.h" />
+    <ClInclude Include="Hint.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="TextButton.h" />
     <ClInclude Include="Text.h" />

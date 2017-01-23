@@ -18,6 +18,7 @@ CLevel::CLevel(RenderWindow & window)
 
 	m_background.setTexture(Resources::GetBackgroundTexture());
 	m_background.setPosition(0.f, static_cast<float>(-WINDOW_HEIGHT));
+	m_hint = new CHint(L"Kill 50 enemies to win!", Vector2f(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2), 72, TARGET_HINT_TIME);
 }
 
 void CLevel::InitTexts()
@@ -87,6 +88,8 @@ void CLevel::Draw() const
 		m_window.draw(m_targetText->GetShape());
 		if (m_bonus != nullptr)
 			m_window.draw(m_bonus->GetShape());
+		if (m_hint != nullptr)
+			m_window.draw(m_hint->GetShape());
 
 		for (auto animation : m_animations)
 		{
@@ -188,7 +191,7 @@ void CLevel::Update()
 		UpdateShooters(deltaTime);
 		UpdateAnimations(deltaTime);
 		UpdateLasers(deltaTime);
-		UpdateTexts();
+		UpdateTexts(deltaTime);
 	}
 	else
 	{
@@ -313,13 +316,19 @@ void CLevel::UpdateBonus(float deltaTime)
 	m_bonus->Update(deltaTime);
 	if (CheckCollision(m_player, m_bonus))
 	{
+		if (m_hint != nullptr)
+			delete m_hint;
 		switch (m_bonus->GetType())
 		{
 		case HEALTH:
 			m_player->GiveHealth(HEALTH_BONUS);
+			m_hint = new CHint(L"+" + to_string(HEALTH_BONUS) + "HP", m_bonus->GetPosition(),
+				36, BONUS_HINT_TIME);
 			break;
 		case SLOW_MO:
 			m_slowMultiplier = SLOW_MULTIPLIER;
+			m_hint = new CHint(L"Slow-mo", m_bonus->GetPosition(),
+				36, BONUS_HINT_TIME);
 			break;
 		}
 
@@ -327,7 +336,7 @@ void CLevel::UpdateBonus(float deltaTime)
 		m_bonus = nullptr;
 		return;
 	}
-	if (m_bonus->GetPosition().y >= WINDOW_HEIGHT)
+	if (m_bonus->GetShape().getGlobalBounds().top >= WINDOW_HEIGHT)
 	{
 		delete m_bonus;
 		m_bonus = nullptr;
@@ -348,11 +357,21 @@ void CLevel::UpdateAnimations(float deltaTime)
 	}
 }
 
-void CLevel::UpdateTexts()
+void CLevel::UpdateTexts(float deltaTime)
 {
 	m_healthText->SetString(L"HP: " + to_string(m_player->GetHealth()));
 	m_scoreText->SetString(L"Score: " + to_string(static_cast<int>(m_score)));
 	m_targetText->SetString(L"Kills: " + to_string(m_kills) + '/' + to_string(TARGET));
+
+	if (m_hint != nullptr)
+	{
+		m_hint->Update(deltaTime);
+		if (m_hint->IsStopped())
+		{
+			delete m_hint;
+			m_hint = nullptr;
+		}
+	}
 }
 
 void CLevel::UpdateButtons()

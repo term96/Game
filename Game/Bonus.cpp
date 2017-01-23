@@ -9,8 +9,9 @@ BonusType CBonus::nextBonusType = BonusType::HEALTH;
 
 CBonus::CBonus(sf::Vector2f position)
 {
+	m_shape.setOrigin(BONUS_WIDTH / 2, BONUS_HEIGHT / 2);
 	m_shape.setSize(Vector2f(BONUS_WIDTH, BONUS_HEIGHT));
-	m_shape.setPosition(position);
+	m_shape.setPosition(position.x + BONUS_WIDTH / 2, position.y + BONUS_HEIGHT / 2);
 	SetBonusType();
 }
 

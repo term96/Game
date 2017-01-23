@@ -83,13 +83,13 @@ void CPlayer::Move(int directionX, int directionY, float deltaTime)
 {
 	float posX = m_shape.getGlobalBounds().left;
 	float deltaX = directionX * PLAYER_SPEED * deltaTime;
-	if (posX + deltaX <= 0 || posX + PLAYER_WIDTH + deltaX >= WINDOW_WIDTH)
+	if (posX + 2 * deltaX <= 0 || posX + PLAYER_WIDTH + 2 * deltaX >= WINDOW_WIDTH)
 	{
 		deltaX = 0;
 	}
 	float posY = m_shape.getGlobalBounds().top;
 	float deltaY = directionY * PLAYER_SPEED * deltaTime;
-	if (posY + deltaY <= 0 || posY + PLAYER_HEIGHT + deltaY >= WINDOW_HEIGHT)
+	if (posY + 2 * deltaY <= 0 || posY + PLAYER_HEIGHT + 2 * deltaY >= WINDOW_HEIGHT)
 	{
 		deltaY = 0;
 	}

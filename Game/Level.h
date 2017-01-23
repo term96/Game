@@ -10,6 +10,7 @@
 #include "Bonus.h"
 #include "TextButton.h"
 #include "AnimRect.h"
+#include "Hint.h"
 #include <vector>
 
 enum AnimType
@@ -40,7 +41,7 @@ private:
 	void UpdateAsteroids(float deltaTime);
 	void UpdateBonus(float deltaTime);
 	void UpdateAnimations(float deltaTime);
-	void UpdateTexts();
+	void UpdateTexts(float deltaTime);
 	void UpdateButtons();
 
 	void CreateAnimation(sf::Vector2f position, AnimType type);
@@ -82,6 +83,7 @@ private:
 	CText * m_scoreText;
 	CText * m_targetText;
 	CText * m_gameEndText = nullptr;
+	CHint * m_hint = nullptr;
 
 	CTextButton * m_continueButton;
 	CTextButton * m_exitButton;

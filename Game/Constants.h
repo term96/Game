@@ -55,6 +55,10 @@ static const float SHOOTER_ANIM_TIME = 0.75f;
 static const float EXPLOSION_ANIM_TIME = 0.625f;
 static const float DAMAGE_ANIM_TIME = 0.4f;
 
+// Время всплывающего текста
+static const float TARGET_HINT_TIME = 2.f;
+static const float BONUS_HINT_TIME = 1.f;
+
 // Другое
 static const float PLAYER_START_HEIGHT = WINDOW_HEIGHT - PLAYER_HEIGHT - 20;
 static const float GAME_SPEED_UP_RATE = 120.f;
